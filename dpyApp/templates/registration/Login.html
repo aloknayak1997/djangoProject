@@ -1,0 +1,53 @@
+{% extends 'base_layout.html' %} {% block title %}Login{% endblock %} {% block content %}
+<div class="wrapper">
+<h2>Dpy_App_Login</h2>
+<form method="post">
+  {% csrf_token %}
+      <p>
+        <label for="id_username">Username:</label>
+        <input type="text" name="username" maxlength="12" required id="id_username">
+        <div id='response'></div>
+    </p>
+    <p>
+        <label for="id_password">Password:</label>
+        <input type="text" name="password" maxlength="12" required id="id_password">
+        <div id='response2'></div>
+    </p>
+      <input type="button" name="btn" class="btn_login" value="Login">
+  <a class="signup" href="/signup">SignUp</a>
+</form>
+</div>
+{% block javascript %}
+<script type="text/javascript">
+  $('.btn_login').click(function () {
+    loginData = [];
+    loginData.push($("#id_username").val());
+    loginData.push($("#id_password").val());
+    console.log(loginData);
+    var url = "{% url 'dpyApp:validate_login' %}";
+    //Sending Ajax Request here
+    $.ajax({
+      url: url,
+      type: "GET",
+      data: {
+        'loginData': loginData,
+      },
+      success: function (response) {
+        console.log(response);
+        if (response.Status == false) {
+          alert("Invalid Login");
+        } else {
+          // var protocol = window.location.protocol;
+          // var current_url = window.location.hostname;
+          // var port = window.location.port;
+          // var next_url = protocol+"//"+current_url+":"+port+"/home";
+          // window.location.replace(next_url);
+          alert("Login Successful!!");
+          window.location = '/home';
+        }
+        //location.reload();
+        //alert("Successfully Added!");
+      },
+    });//End of ajax request
+  });
+</script> {% endblock %} {% endblock %}

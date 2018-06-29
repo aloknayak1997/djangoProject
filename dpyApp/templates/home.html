@@ -1,0 +1,142 @@
+{% extends 'base_layout.html' %} {% block title %} Home {% endblock %} {% block content %}
+<div id="menu">
+                <div class="icon">
+                    <div class="menus" title="HR Management">
+                        <a href="/manage_hr/"> <i style="color: #fff;" class="fas fa-users-cog"></i></a>
+                        
+                    </div>
+                </div>
+                <div class="icon">
+                                <div class="menus" title="Profile">
+                                    <a href="/home">
+                                        <i style="color: #fff;" class="fas fa-user-cog"></i>        
+                                </a>
+                                </div>
+                            </div>
+            </div>
+<div class='home'>
+        <h1>DPYHome User id:<span id="id">{{id}}</span>
+                <a class="signup" style=" float: right; " href="/login">Logout</a>
+        </h1>
+        <div id="status">
+                <h2> Profile Updated
+                        <span id="value"> {{count}}</span> %</h2>
+                <div id="myProgress">
+                        <div id="myBar"></div>
+                </div>
+        </div>
+</div>
+<form method="POST" class="data">
+        {% csrf_token %}
+        <svg class="icons" viewBox="0 0 24 24">
+                <!-- <path class="cls-1" d="M19,14.94v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2v-12a2,2,0,0,1,2-2H9"></path> -->
+                <polygon class="cls-1" points="18.12 8.72 12.46 14.38 8.93 15.09 9.64 11.55 15.29 5.89 18.12 8.72"></polygon>
+                <rect class="cls-1" x="16.12" y="3.89" width="4" height="4" transform="translate(1.14 14.54) rotate(-45)"></rect>
+        </svg>
+        <svg class="save hide" style=" margin: -6px 0 0 34%; " viewBox="0 0 128,128">
+                <path style="stroke:#44ccff;stroke-width:4px;stroke-linecap:square;stroke-linejoin:bevel;fill:none;" d="M30,30 l52,0 l16,16 l0,52 l-68,0 l 0,-68 M40,30 l0,24 l36,0 l0,-24 M48,30 l0,16 l6,0 l0,-16 M40,98 l0,-30 l48,0 l0,30"></path>
+        </svg>
+        {% for instance in data %} {% for field, value in instance.fields.items %}
+        <h3>
+                {{ field }}:- {% if value == "None" or value == None %}
+                <span class="input" id={{field}}>{{ value }}</span>
+
+                <div class="overlay">
+                        <div class="close"></div>You have Not given your {{field}}</div>
+                {% else %}
+                <span class="input" id={{field}}> {{ value }}</span>
+                {% endif %}
+        </h3>
+        {% endfor %} {% endfor %}
+
+        <!-- <div class="feilds">
+            <label>Email:</label>
+            <input type="text" value={{email}}/>
+    </div>
+    <div class="feilds">
+            <label>Mobile number:</label>
+            <input type="text" value={{mobile_number}}/>
+    </div>
+    <div class="feilds">
+            <label>Adhaar number:</label>
+            <input type="text" value={{adhaar_number}}/>
+    </div> -->
+</form>
+{% endblock %} {% block javascript %}
+<script type="text/javascript">
+
+        $(document).ready(function () {
+
+                $('svg.icons').click(function () {
+                        $("span.input").attr('contenteditable', 'true').css('padding', '4px 7px');
+                        $('svg.save').toggleClass('hide');
+                });
+                $('svg.save').click(function () {
+                        $("span.input").attr('contenteditable', 'false').css('padding', '3px 7px');
+                        $('svg.save').toggleClass('hide');
+
+                        var id,username, password, email, mobile_number, adhaar_number;
+                        id = $('span#id').html();
+                        username = $('#username').html();
+                        password = $('#password').html();
+                        email = $('#email').html();
+                        mobile_number = $('#mobile_number').html();
+                        adhaar_number = $('#adhaar_number').html();
+                        var data = [];
+                        data.push(id,username, password, email, mobile_number, adhaar_number);
+                        console.log(data);
+                        $.ajax({
+                                url: '/update_user/',
+                                type: 'POST',
+                                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                                enctype: "multipart/form-data",
+                                data: {
+                                        'studentData': data,
+                                },
+                                dataType: 'json',
+                                success: function (data) {
+                                        if (data.is_taken) {
+                                                dataupdated = true;
+                                                $('.notification').append("<div class='overlay green'> <div class='close'></div>Profile Updated Successfully!!</div>");
+                                        }
+                                        else {
+                                                dataupdated = false;
+                                        }
+                                }
+                        });
+
+                });
+
+                move();
+                var maxwidth = $('span#value').html()
+                console.log(maxwidth);
+
+                
+                function move() {
+                        var elem = document.getElementById("myBar");
+                        var width = 1;
+                        var id = setInterval(frame, 10);
+                        function frame() {
+                                if (width >= maxwidth) {
+                                        clearInterval(id);
+                                } else {
+                                        width++;
+                                        elem.style.width = width + '%';
+                                }
+                        }
+                }
+
+                function getCookie(c_name) {
+                        if (document.cookie.length > 0) {
+                                c_start = document.cookie.indexOf(c_name + "=");
+                                if (c_start != -1) {
+                                        c_start = c_start + c_name.length + 1;
+                                        c_end = document.cookie.indexOf(";", c_start);
+                                        if (c_end == -1) c_end = document.cookie.length;
+                                        return unescape(document.cookie.substring(c_start, c_end));
+                                }
+                        }
+                        return "";
+                }
+        });
+</script> {% endblock %}

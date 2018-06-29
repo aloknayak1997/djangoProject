@@ -1,0 +1,92 @@
+{% extends 'base_layout.html' %} {% block title %}SignUp{% endblock %} {% block content %}
+<div class="wrapper">
+<h2>DpySignUp</h2>
+<div id="loginresponse"></div>
+<form method="POST">
+    {% csrf_token %}
+    <p>
+        <label for="id_username">Username:</label>
+        <input type="text" name="username" maxlength="12" required id="id_username">
+        <div id='response'></div>
+    </p>
+    <p>
+        <label for="id_password">Password:</label>
+        <input type="text" name="password" maxlength="12" required id="id_password">
+        <div id='response2'></div>
+    </p>
+    <button id="submit">SignUp</button>
+    <a class="signup" href="/login">Already a User Login..</a>
+</form>
+</div>
+{% block javascript %}
+<script type="text/javascript">
+    var uservalidate;
+    $("#id_username").change(function () {
+        $('div#response').css('display', 'none');
+        var username = $(this).val();
+        $.ajax({
+            url: '/ajax/validate_username/',
+            type: 'GET',
+            data: {
+                'username': username
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.is_taken) {
+                    $('div#response').css('display', 'block').css('background', 'red').css('padding', '7px');
+                    $('div#response').html('A user with this username already exists');
+                    uservalidate = false;
+                }
+                else {
+                    $('div#response').css('display', 'block').css('background', 'green').css('padding', '7px');
+                    $('div#response').html('Username available');
+                    uservalidate = true;
+                }
+            }
+        });
+    });
+
+    $('#submit').click(function () {
+        var username = $('#id_username').val();
+        var password = $('#id_password').val();
+        if (password != '' && uservalidate == true) {
+            $.ajax({
+                url: '/ajax/insert_user/',
+                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                type: 'POST',
+                data: {
+                    'username': username,
+                    'password': password
+                },
+                success: function (response) {
+                    if (response.Status == true) {
+                        alert('User Created!!');
+                        window.location='http://127.0.0.1:8000/login';
+                        // $('div#loginresponse').css('display', 'block').css('background', 'green').css('padding', '7px');
+                        // $('div#loginresponse').html('SignUp Successful');
+                    }
+                    else {
+                        // $('div#loginresponse').css('display', 'block').css('background', 'red').css('padding', '7px');
+                        // $('div#loginresponse').html('SignUp Failed');
+                    }
+                }
+            });
+        }
+        else {
+            $('#response2').html('password cannot be empty');
+        }
+    });
+
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) c_end = document.cookie.length;
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }
+</script> {% endblock %} {% endblock %}

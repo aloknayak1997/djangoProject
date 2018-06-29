@@ -1,0 +1,42 @@
+{%load static from staticfiles%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"
+        crossorigin="anonymous">
+    <title>{% block title%}Dpy_App{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+</head>
+
+<body>
+    <div class="notification"></div>
+    <div class="content">
+        {% block content %} {% endblock %}
+    </div>
+</body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> {% block javascript %}{% endblock %}
+<script>
+    $('.overlay').appendTo(".notification");
+
+    $(document).on('click', '.overlay', function () { $(this).remove(); });
+
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) c_end = document.cookie.length;
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }
+</script>
+
+</html>
